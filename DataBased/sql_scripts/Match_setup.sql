@@ -5,7 +5,7 @@ truncate table import_match_team
 
 INSERT INTO public.events
 ( "name", city)
-VALUES( 'Waco', 'Waco')
+VALUES( 'NTX1', 'Rockwall')
 
 /****************Run this after the data is loaded***************************/
 
@@ -18,8 +18,13 @@ select * from events
 
 insert into matches
 (event_id, match_number)
-select distinct 7, match from import_match_team m
+select distinct 9, match from import_match_team m
 
+select mta.match_team_assoc_id , mta.match_id, et.event_team_id,  mta.alliance_color, m.match_number
+from match_team_assoc mta 
+join matches m on mta.match_id = m.match_id 
+join event_team et on et.event_id  = m.event_id  and et.team_id = mta.team_id
+where match_team_assoc_id=2262
 
 insert into teams 
 (number, source_key)
@@ -46,10 +51,10 @@ where not exists (select 1 from teams t where t."number" = x.number)
 
 
 
-INSERT INTO event_team_assoc
+INSERT INTO event_team 
 (event_id, team_id)
 
-SELECT distinct 4, team_id
+SELECT distinct 9, team_id
 FROM teams t
 WHERE EXISTS (SELECT 1 FROM import_match_team ims WHERE CAST(blue1 AS int) = t.Number)
 OR EXISTS (
@@ -62,7 +67,7 @@ insert into match_team_assoc
 select match_id, team_id, 'blue'
 from 
 import_match_team ims 
-join matches m on ims."match" = m.match_number  and m.event_id = 4
+join matches m on ims."match" = m.match_number  and m.event_id = 9
 join teams t on t.number  = cast(ims.blue1 as int)
 order by match_id 
 
@@ -72,7 +77,7 @@ insert into match_team_assoc
 select match_id, team_id, 'blue'  
 from 
 import_match_team ims 
-join matches m on ims."match" = m.match_number  and m.event_id = 4
+join matches m on ims."match" = m.match_number  and m.event_id = 9
 join teams t on t.number  = cast(ims.blue2 as int)
 order by m.match_number
 
@@ -82,7 +87,7 @@ insert into match_team_assoc
 select  match_id, team_id, 'blue'
 from 
 import_match_team ims 
-join matches m on ims."match" = m.match_number  and m.event_id = 4
+join matches m on ims."match" = m.match_number  and m.event_id = 9
 join teams t on t.number  = cast(ims.blue3 as int)
 order by m.match_number 
 
@@ -92,7 +97,7 @@ insert into match_team_assoc
 select match_id, team_id, 'red'
 from 
 import_match_team ims 
-join matches m on ims."match" = m.match_number  and m.event_id = 4
+join matches m on ims."match" = m.match_number  and m.event_id = 9
 join teams t on t.number  = cast(ims.red1 as int)
 order by m.match_number 
 
@@ -102,7 +107,7 @@ insert into match_team_assoc
 select match_id, team_id, 'red' 
 from 
 import_match_team ims 
-join matches m on ims."match" = m.match_number  and m.event_id = 4
+join matches m on ims."match" = m.match_number  and m.event_id = 9
 join teams t on t.number  = cast(ims.red2 as int)
 
 insert into match_team_assoc
@@ -110,5 +115,9 @@ insert into match_team_assoc
 select match_id, team_id, 'red' 
 from 
 import_match_team ims 
-join matches m on ims."match" = m.match_number  and m.event_id = 4
+join matches m on ims."match" = m.match_number  and m.event_id = 9
 join teams t on t.number  = cast(ims.red3 as int)
+
+call load_match_data (9);
+refresh materialized view vw_average_scores;
+

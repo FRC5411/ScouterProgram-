@@ -2,15 +2,16 @@ import json
 import os 
 import glob
 import psycopg2
-path = '../ScouterProgram-/DataBased/data'
+path = '../program-main-scouterProgram/DataBased/data'
 #path = '..//data'
 FileDir = glob.glob(path + '/*.json')
 
 conn = psycopg2.connect(
     host = "localhost",
+    port = "5411",
     dbname = "Crescendo",
     user = "talonscout",
-    password = "5411"
+    password = "talonscout"
 )
 cur = conn.cursor()
 print("Start")
